@@ -1,26 +1,4 @@
-/*
-Copyright IBM Corp. 2016 All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-		 http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package main
-
-//WARNING - this chaincode's ID is hard-coded in chaincode_example04 to illustrate one way of
-//calling chaincode from a chaincode. If this example is modified, chaincode_example04.go has
-//to be modified as well with the new ID of chaincode_example02.
-//chaincode_example05 show's how chaincode ID can be passed in as a parameter instead of
-//hard-coding.
 
 import (
 	"errors"
@@ -31,7 +9,6 @@ import (
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
-// SimpleChaincode example simple Chaincode implementation
 type SimpleChaincode struct {
 }
 
@@ -41,12 +18,12 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	return nil, err
 }
 
-// Transaction makes payment of X units from A to B
 func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	var err error
+	//	table_name := args[0]
 
 	switch function {
-	case "enroll":
+	case "add":
 		uuid := args[0]
 		if _, err := attributes.FromJson([]byte(args[1])); err != nil {
 			return nil, errors.New("bad json")
@@ -55,7 +32,7 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		if err = stub.PutState(uuid, []byte(info)); err != nil {
 			return nil, errors.New("failed to enroll")
 		}
-	case "unenroll":
+	case "del":
 		uuid := args[0]
 		if err = stub.DelState(uuid); err != nil {
 			return nil, errors.New("failed to unenroll")
@@ -77,17 +54,25 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 	return nil, err
 }
 
-// Query callback representing the query of a chaincode
 func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	var info []byte
 	var uuid string
+	var err error
 
-	var cols []shim.Column
-	cols = append(cols, shim.Column{&shim.Column_String_{"student"}})
+	switch function {
+	case "query":
+		var cols []shim.Column
+		var rows shim.Row
+		cols = append(cols, shim.Column{&shim.Column_String_{"student"}})
 
-	rows, err := stub.GetRow("table_rules", []shim.Column{shim.Column{&shim.Column_String_{"student"}}})
+		rows, err := stub.GetRow("table_rules", []shim.Column{shim.Column{&shim.Column_String_{"student"}}})
 
-	return []byte(rows.String()), err
+		return []byte(rows.String()), err
+	case "cert":
+		return stub.GetCallerCertificate()
+	default:
+		return []byte{}, nil
+	}
 
 	uuid = args[0]
 
