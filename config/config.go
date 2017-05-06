@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -15,9 +14,84 @@ type Object map[string]interface{}
 
 type Rule string
 
+var dat []byte = `
+{
+"objects" : [
+	 {
+		"type" : "table",
+		"name" : "student",
+		"columns" : [
+			  {"name": "id", "type" : "string"},
+			  {"name": "name", "type" : "string"},
+			  {"name": "status", "type" : "string"}
+			  ],
+		"rule" : "usr[staff][department] == \"Academic\" && usr[staff][level] >= 3"
+	 },
+	 {
+		"type" : "table",
+		"name" : "pay",
+		"columns" : [ {"name": "paid", "type" : "string"} ],
+		"rule" : "usr[staff][department] == \"Financial\" && usr[staff][level] >= 7"
+	 },
+       	 {
+		"type" : "table",
+		"name" : "staff",
+		"columns" : [
+				{"name":"id", "type" : "string"},
+				{"name":"name", "type" : "string"},
+				{"name":"department", "type" : "string"},
+				{"name":"level", "type" : "int"},
+				{"name":"status", "type" : "string"}
+			    ],
+
+		"rule" : "usr[staff][department] == \"Personnel\" && usr[staff][level] >= 5 && usr[status] == \"normal\""
+	 },
+	 {
+		"type" : "table",
+		"name" : "netusr",
+		"columns" : [{"name":"id", "type" : "string"},
+				{"name":"balance", "type" : "int"}],
+		"rule" : "usr[staff][department] == \"Network\""
+	 },
+	 {
+		"type" : "action",
+		"name" : "connect_network",
+		"rule" : "target[student][status] == \"registered\" &&  target[netusr][balance] > 0"
+	 },
+	 {
+		"type" : "action",
+		"name" : "connect_network"
+	 }
+	 ],
+"init_users": [
+	{
+		"id" : "PBoss",
+		"[staff][department]" : "Personnel",
+		"[staff][level]" : "7"
+	},
+	{
+		"id" : "NBoss",
+		"[staff][department]" : "Network",
+		"[staff][level]" : "7"
+	},
+	{
+		"id" : "ABoss",
+		"[staff][department]" : "Academic",
+		"[staff][level]" : "7"
+	},
+	{
+		"id" : "FBoss",
+		"[staff][department]" : "Financial",
+		"[staff][level]" : "8"
+	}
+
+  ]
+} 
+`
+
 func FromFile(file string) (Config, error) {
 	var config Config
-	dat, err := ioutil.ReadFile(file)
+	//	dat, err := ioutil.ReadFile(file)
 	err = json.Unmarshal(dat, &config)
 	return config, err
 }
