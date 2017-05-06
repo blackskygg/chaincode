@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
@@ -44,8 +45,12 @@ func processTable(stub shim.ChaincodeStubInterface, content map[string]interface
 	row := shim.Row{}
 	row.Columns = append(row.Columns, &shim.Column{&shim.Column_String_{tbl_name}})
 	row.Columns = append(row.Columns, &shim.Column{&shim.Column_String_{content["rule"].(string)}})
-	fmt.Print(row)
-	stub.InsertRow("table_rules", row)
+	r, e := stub.InsertRow("table_rules", row)
+	if e != nil {
+		os.Exit(10)
+	}
+	fmt.Print(r)
+	fmt.Print(e)
 }
 
 func processAction(stub shim.ChaincodeStubInterface, content map[string]interface{}) {
@@ -67,7 +72,10 @@ func createTables(stub shim.ChaincodeStubInterface) {
 	cols_def = append(cols_def, &shim.ColumnDefinition{
 		Type: shim.ColumnDefinition_STRING,
 		Name: "rule"})
-	stub.CreateTable("table_rules", cols_def)
+	if r := stub.CreateTable("table_rules", cols_def); r != nil {
+		fmt.Print(r)
+		os.Exit(9)
+	}
 }
 
 // This should only be invoked once.
