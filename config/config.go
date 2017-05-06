@@ -14,7 +14,7 @@ type Object map[string]interface{}
 
 type Rule string
 
-var dat []byte = `
+const dat = `
 {
 "objects" : [
 	 {
@@ -92,7 +92,7 @@ var dat []byte = `
 func FromFile(file string) (Config, error) {
 	var config Config
 	//	dat, err := ioutil.ReadFile(file)
-	err = json.Unmarshal(dat, &config)
+	err := json.Unmarshal([]byte(dat), &config)
 	return config, err
 }
 
