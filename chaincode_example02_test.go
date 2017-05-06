@@ -72,4 +72,5 @@ func TestExample02_Init(t *testing.T) {
 
 	// Init A=123 B=234
 	checkInit(t, stub, []string{})
+	checkQuery(t, stub, "", "")
 }

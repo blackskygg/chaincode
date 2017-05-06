@@ -37,6 +37,7 @@ type SimpleChaincode struct {
 
 func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	conf, err := config.FromFile("init.conf")
+	conf.ApplyConfig(stub)
 	fmt.Print(conf)
 	return nil, err
 }
@@ -82,6 +83,13 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 	var info []byte
 	var uuid string
 	var err error
+
+	var cols []shim.Column
+	cols = append(cols, shim.Column{&shim.Column_String_{"student"}})
+	var c shim.Column
+	rows, err := stub.GetRow("table_rules", cols)
+	c = *(rows.Columns[0])
+	return []byte(c.GetString_()), nil
 
 	uuid = args[0]
 
