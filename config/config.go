@@ -17,6 +17,15 @@ type Rule string
 const dat = `
 {
 "objects" : [
+         {
+                "type" : "table",
+                "name" : "face",
+                "columns" : [
+                       {"name": "id", "type": "string"},
+                       {"name": "uid", "type": "string"}
+                     ],
+                "rule" : "usr[department] == \"Academic\" && usr[staff][level] >= 3"
+         },
 	 {
 		"type" : "table",
 		"name" : "student",
@@ -25,13 +34,13 @@ const dat = `
 			  {"name": "name", "type" : "string"},
 			  {"name": "status", "type" : "string"}
 			  ],
-		"rule" : "usr[staff][department] == \"Academic\" && usr[staff][level] >= 3"
+		"rule" : "usr[department] == \"Academic\" && usr[staff][level] >= 3"
 	 },
 	 {
 		"type" : "table",
 		"name" : "pay",
 		"columns" : [ {"name": "paid", "type" : "string"} ],
-		"rule" : "usr[staff][department] == \"Financial\" && usr[staff][level] >= 7"
+		"rule" : "usr[department] == \"Financial\" && usr[staff][level] >= 7"
 	 },
        	 {
 		"type" : "table",
@@ -44,14 +53,14 @@ const dat = `
 				{"name":"status", "type" : "string"}
 			    ],
 
-		"rule" : "usr[staff][department] == \"Personnel\" && usr[staff][level] >= 5 && usr[status] == \"normal\""
+		"rule" : "usr[department] == \"Personnel\" && usr[staff][level] >= 5 && usr[status] == \"normal\""
 	 },
 	 {
 		"type" : "table",
 		"name" : "netusr",
 		"columns" : [{"name":"id", "type" : "string"},
 				{"name":"balance", "type" : "int"}],
-		"rule" : "usr[staff][department] == \"Network\""
+		"rule" : "usr[department] == \"Network\""
 	 },
 	 {
 		"type" : "action",
