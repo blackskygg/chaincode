@@ -87,7 +87,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 
 	rows, err := stub.GetRow("table_rules", []shim.Column{shim.Column{&shim.Column_String_{"student"}}})
 
-	return []byte(rows.Columns[0].GetString_()), err
+	return []byte(rows.String()), err
 
 	uuid = args[0]
 
