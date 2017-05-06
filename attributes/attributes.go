@@ -1,4 +1,4 @@
-package main
+package attributes
 
 import (
 	json "encoding/json"
@@ -33,6 +33,7 @@ func (a Attribute) DelKey(key string) (string, error) {
 	}
 }
 
+func init() {}
 func test() {
 	b := []byte("{\"a\":\"aaa\", \"b\":\"bbb\"}")
 	a, _ := FromJson(b)

@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"encoding/json"
@@ -13,3 +13,5 @@ func FromFile(file string) (Config, error) {
 	err = json.Unmarshal(dat, &config)
 	return config, err
 }
+
+func init() {}

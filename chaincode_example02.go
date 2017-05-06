@@ -26,6 +26,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/blackskygg/chaincode/attributes"
+	"github.com/blackskygg/chaincode/config"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
@@ -34,7 +36,9 @@ type SimpleChaincode struct {
 }
 
 func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	return nil, nil
+	conf, err := config.FromFile("init.conf")
+	fmt.Print(conf)
+	return nil, err
 }
 
 // Transaction makes payment of X units from A to B
@@ -44,6 +48,9 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 	switch function {
 	case "enroll":
 		uuid := args[0]
+		if _, err := attributes.FromJson([]byte(args[1])); err != nil {
+			return nil, errors.New("bad json")
+		}
 		info := args[1]
 		if err = stub.PutState(uuid, []byte(info)); err != nil {
 			return nil, errors.New("failed to enroll")
@@ -63,7 +70,6 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		if err = stub.PutState(uuid, []byte(info)); err != nil {
 			return nil, err
 		}
-
 	default:
 		return nil, err
 	}
@@ -79,7 +85,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 
 	uuid = args[0]
 
-	if info, err = stub.GetState(uuid); err != nil {
+	if info, err = stub.GetState(uuid); info == nil {
 		jsonResp := "{\"Error\":\"Not a valid student\"}"
 		return nil, errors.New(jsonResp)
 	}
