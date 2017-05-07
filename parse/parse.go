@@ -1,7 +1,6 @@
 package parse
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 
@@ -9,10 +8,13 @@ import (
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
-func makeParameterMap(stub shim.ChaincodeStubInterface, exp, id string) map[string]interface{} {
+func makeParameterMap(stub shim.ChaincodeStubInterface, exp, id string) (map[string]interface{}, error) {
 	result := make(map[string]interface{})
-	re, _ := regexp.Compile(`attr(_\w+)+`)
-	wre, _ := regexp.Compile(`[a-z0-9]+`)
+	re, err := regexp.Compile(`attr(_\w+)+`)
+	wre, err := regexp.Compile(`[a-z0-9]+`)
+	if err != nil {
+		return result, error
+	}
 
 	l := re.FindAllString(exp, -1)
 	for _, w := range l {
@@ -20,12 +22,20 @@ func makeParameterMap(stub shim.ChaincodeStubInterface, exp, id string) map[stri
 		table_name := wl[1]
 
 		idx, err := strconv.Atoi(wl[2])
+		if err != nil {
+			return result, error
+		}
 
 		row, err := stub.GetRow(table_name, []shim.Column{shim.Column{&shim.Column_String_{id}}})
-		tbl, err := stub.GetTable(table_name)
+		if err != nil {
+			return result, error
+		}
 
-		fmt.Print("good")
-		fmt.Print(err)
+		tbl, err := stub.GetTable(table_name)
+		if err != nil {
+			return result, error
+		}
+
 		if tbl.ColumnDefinitions[idx].Type == shim.ColumnDefinition_STRING {
 			result[w] = interface{}(row.Columns[idx].GetString_())
 		} else if tbl.ColumnDefinitions[idx].Type == shim.ColumnDefinition_INT32 {
@@ -45,7 +55,11 @@ func Eval(exp string, stub shim.ChaincodeStubInterface, id string) (bool, error)
 		return false, err
 	}
 
-	params = makeParameterMap(stub, exp, id)
+	params, err = makeParameterMap(stub, exp, id)
+	if err != nil {
+		return false, error
+	}
+
 	result, err := expression.Evaluate(params)
 	return result.(bool), err
 }
