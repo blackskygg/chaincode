@@ -11,8 +11,8 @@ import (
 
 func makeParameterMap(stub shim.ChaincodeStubInterface, exp, id string) map[string]interface{} {
 	result := make(map[string]interface{})
-	re, _ := regexp.Compile(`attr(\[\w+\])+`)
-	wre, _ := regexp.Compile(`\w+`)
+	re, _ := regexp.Compile(`attr(_\w+)+`)
+	wre, _ := regexp.Compile(`[a-z0-9]+`)
 
 	l := re.FindAllString(exp, -1)
 	for _, w := range l {
