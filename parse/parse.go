@@ -13,7 +13,7 @@ func makeParameterMap(stub shim.ChaincodeStubInterface, exp, id string) (map[str
 	re, err := regexp.Compile(`attr(_\w+)+`)
 	wre, err := regexp.Compile(`[a-z0-9]+`)
 	if err != nil {
-		return result, error
+		return result, err
 	}
 
 	l := re.FindAllString(exp, -1)
@@ -23,17 +23,17 @@ func makeParameterMap(stub shim.ChaincodeStubInterface, exp, id string) (map[str
 
 		idx, err := strconv.Atoi(wl[2])
 		if err != nil {
-			return result, error
+			return result, err
 		}
 
 		row, err := stub.GetRow(table_name, []shim.Column{shim.Column{&shim.Column_String_{id}}})
 		if err != nil {
-			return result, error
+			return result, err
 		}
 
 		tbl, err := stub.GetTable(table_name)
 		if err != nil {
-			return result, error
+			return result, err
 		}
 
 		if tbl.ColumnDefinitions[idx].Type == shim.ColumnDefinition_STRING {
@@ -44,7 +44,7 @@ func makeParameterMap(stub shim.ChaincodeStubInterface, exp, id string) (map[str
 
 	}
 
-	return result
+	return result, nil
 
 }
 
@@ -57,7 +57,7 @@ func Eval(exp string, stub shim.ChaincodeStubInterface, id string) (bool, error)
 
 	params, err = makeParameterMap(stub, exp, id)
 	if err != nil {
-		return false, error
+		return false, err
 	}
 
 	result, err := expression.Evaluate(params)
