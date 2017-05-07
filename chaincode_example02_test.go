@@ -43,7 +43,7 @@ func checkState(t *testing.T, stub *shim.MockStub, name string, value string) {
 }
 
 func checkQuery(t *testing.T, stub *shim.MockStub, name string, value string) {
-	bytes, err := stub.MockQuery("query", []string{name})
+	bytes, err := stub.MockQuery("query", []string{name, value})
 	if err != nil {
 		fmt.Println("Query", name, "failed", err)
 		t.FailNow()
@@ -72,5 +72,5 @@ func TestExample02_Init(t *testing.T) {
 
 	// Init A=123 B=234
 	checkInit(t, stub, []string{})
-	checkQuery(t, stub, "", "")
+	checkQuery(t, stub, "000", "kkk")
 }

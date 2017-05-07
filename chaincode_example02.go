@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/blackskygg/chaincode/config"
+	"github.com/blackskygg/chaincode/parse"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
@@ -124,34 +125,29 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 }
 
 func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	var info []byte
-	var uuid string
-	var err error
-
+	id := string(args[0])
+	expression := string(args[1])
 	switch function {
 	case "query":
-		var cols []shim.Column
-		var rows shim.Row
-		cols = append(cols, shim.Column{&shim.Column_String_{"student"}})
+		var result string
+		var val bool
+		var err error
+		if val, err = parse.Eval(expression, stub, id); err != nil {
+			return nil, err
+		}
 
-		rows, err := stub.GetRow("table_rules",
-			[]shim.Column{shim.Column{&shim.Column_String_{"student"}}})
+		if val {
+			result = "true"
+		} else {
+			result = "false"
+		}
 
-		return []byte(rows.String()), err
-	case "cert":
-		return stub.GetCallerCertificate()
+		return []byte(result), nil
 	default:
 		return []byte{}, nil
 	}
 
-	uuid = args[0]
-
-	if info, err = stub.GetState(uuid); info == nil {
-		jsonResp := "{\"Error\":\"Not a valid student\"}"
-		return nil, errors.New(jsonResp)
-	}
-
-	return info, err
+	return []byte{}, nil
 }
 
 func main() {
