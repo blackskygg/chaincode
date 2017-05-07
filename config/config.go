@@ -39,7 +39,7 @@ const dat = `
 	 {
 		"type" : "table",
 		"name" : "pay",
-		"columns" : [ {"name": "paid", "type" : "string"} ],
+		"columns" : [ {"name": "id", "type" : "string"}, {"name": "paid", "type" : "string"} ],
 		"rule" : "usr[department] == \"Financial\" && usr[staff][level] >= 7"
 	 },
        	 {
