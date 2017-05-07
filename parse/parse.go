@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/Knetic/govaluate"
+	"github.com/blackskygg/chaincode/third/govaluate"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
